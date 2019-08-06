@@ -24,7 +24,7 @@ export default function createReactiveClass(tag) {
     }
 
     addPropListener(name, prop$) {
-      return prop$.subscribeOnNext((value) => {
+      return prop$.subscribe((value) => {
         // don't re-render if value is the same.
         if (value === this.state[name]) {
           return;
@@ -53,7 +53,7 @@ export default function createReactiveClass(tag) {
     }
 
     unsubscribe() {
-      this.subscriptions.forEach(subscription => subscription.dispose());
+      this.subscriptions.forEach(subscription => subscription.unsubscribe());
       this.subscriptions = null;
     }
 
