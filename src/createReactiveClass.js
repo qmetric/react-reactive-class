@@ -14,7 +14,7 @@ export default function createReactiveClass(tag) {
       this.subscribe(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       this.subscribe(nextProps);
       this.setState(pickProps(nextProps, (key, value) => !isRxObservable(value)));
     }
