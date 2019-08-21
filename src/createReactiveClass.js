@@ -10,7 +10,7 @@ export default function createReactiveClass(tag) {
       this.state.mount = true;
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
       this.subscribe(this.props);
     }
 
