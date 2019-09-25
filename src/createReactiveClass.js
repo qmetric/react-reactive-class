@@ -2,21 +2,19 @@ import React from 'react';
 import {isRxObservable, pickProps} from './utils';
 
 export default function createReactiveClass(tag) {
-  class ReactiveClass extends React.Component {
+  class ReactiveClass extends React.PureComponent {
     constructor(props) {
       super(props);
       this.displayName = `ReactiveElement-${tag}`;
       this.state = pickProps(props, (key, value) => !isRxObservable(value));
       this.state.mount = true;
-    }
 
-    componentWillMount() {
       this.subscribe(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
-      this.subscribe(nextProps);
-      this.setState(pickProps(nextProps, (key, value) => !isRxObservable(value)));
+    componentDidUpdate() {
+      this.subscribe(props);
+      this.setState(pickProps(props, (key, value) => !isRxObservable(value)));
     }
 
     componentWillUnmount() {
@@ -24,7 +22,7 @@ export default function createReactiveClass(tag) {
     }
 
     addPropListener(name, prop$) {
-      return prop$.subscribeOnNext((value) => {
+      return prop$.subscribe((value) => {
         // don't re-render if value is the same.
         if (value === this.state[name]) {
           return;
@@ -41,19 +39,17 @@ export default function createReactiveClass(tag) {
         this.unsubscribe();
       }
 
-      this.subscriptions = [];
-
-      Object.keys(props).forEach(key => {
+      this.subscriptions = Object.keys(props).forEach((acc, key) => {
         const value = props[key];
         if (isRxObservable(value)) {
           const subscription = this.addPropListener(key, value);
-          this.subscriptions.push(subscription);
+          acc.push(subscription);
         }
-      });
+      }, []);
     }
 
     unsubscribe() {
-      this.subscriptions.forEach(subscription => subscription.dispose());
+      this.subscriptions.forEach(subscription => subscription.unsubscribe());
       this.subscriptions = null;
     }
 
