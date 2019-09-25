@@ -39,7 +39,7 @@ export default function createReactiveClass(tag) {
         this.unsubscribe();
       }
 
-      this.subscriptions = Object.keys(props).forEach((acc, key) => {
+      this.subscriptions = Object.keys(props).reduce((acc, key) => {
         const value = props[key];
         if (isRxObservable(value)) {
           const subscription = this.addPropListener(key, value);
