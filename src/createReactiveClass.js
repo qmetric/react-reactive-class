@@ -38,14 +38,14 @@ export default function createReactiveClass(tag) {
       if (this.subscriptions) {
         this.unsubscribe();
       }
-
-      this.subscriptions = Object.keys(props).reduce((acc, key) => {
+      this.subscriptions = [];
+      Object.keys(props).forEach(key => {
         const value = props[key];
         if (isRxObservable(value)) {
           const subscription = this.addPropListener(key, value);
-          acc.push(subscription);
+          this.subscriptions.push(subscription);
         }
-      }, []);
+      });
     }
 
     unsubscribe() {
