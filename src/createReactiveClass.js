@@ -7,6 +7,7 @@ export default function createReactiveClass(tag) {
       super(props);
       this.displayName = `ReactiveElement-${tag}`;
       this.state = pickProps(props, (key, value) => !isRxObservable(value));
+      this.state.mount = false;
     }
 
     componentDidMount() {
