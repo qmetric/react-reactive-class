@@ -2,21 +2,23 @@ import React from 'react';
 import {isRxObservable, pickProps} from './utils';
 
 export default function createReactiveClass(tag) {
-  class ReactiveClass extends React.Component {
+  class ReactiveClass extends React.PureComponent {
     constructor(props) {
       super(props);
       this.displayName = `ReactiveElement-${tag}`;
       this.state = pickProps(props, (key, value) => !isRxObservable(value));
-      this.state.mount = true;
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
+      this.setState({mount: true});
       this.subscribe(this.props);
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-      this.subscribe(nextProps);
-      this.setState(pickProps(nextProps, (key, value) => !isRxObservable(value)));
+    componentDidUpdate(prevProps) {
+      if(this.props !== prevProps) {
+        this.subscribe(this.props);
+        this.setState(pickProps(this.props, (key, value) => !isRxObservable(value)));
+      }
     }
 
     componentWillUnmount() {
@@ -41,15 +43,14 @@ export default function createReactiveClass(tag) {
         this.unsubscribe();
       }
 
-      this.subscriptions = [];
-
-      Object.keys(props).forEach(key => {
+      this.subscriptions = Object.keys(props).reduce((acc, key) => {
         const value = props[key];
         if (isRxObservable(value)) {
           const subscription = this.addPropListener(key, value);
-          this.subscriptions.push(subscription);
+          acc.push(subscription);
         }
-      });
+        return acc;
+      }, []);
     }
 
     unsubscribe() {
