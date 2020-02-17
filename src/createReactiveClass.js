@@ -1,71 +1,22 @@
 import React from 'react';
-import {isRxObservable, pickProps} from './utils';
+import useSubscription from './useSubscription';
+import mapValues from 'lodash/fp/mapValues';
+import omit from 'lodash/fp/omit';
 
-export default function createReactiveClass(tag) {
-  class ReactiveClass extends React.Component {
-    constructor(props) {
-      super(props);
-      this.displayName = `ReactiveElement-${tag}`;
-      this.state = pickProps(props, (key, value) => !isRxObservable(value));
-      this.state.mount = true;
-    }
+export default component => props => {
+  const usePropSubscription = prop$ => {
+    const [prop, setProp] = React.useState();
 
-    UNSAFE_componentWillMount() {
-      this.subscribe(this.props);
-    }
+    useSubscription(prop$, setProp);
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-      this.subscribe(nextProps);
-      this.setState(pickProps(nextProps, (key, value) => !isRxObservable(value)));
-    }
+    return prop;
+  };
 
-    componentWillUnmount() {
-      this.unsubscribe();
-    }
+  const newProps = mapValues(prop => (prop.subscribe ? usePropSubscription(prop) : prop), props);
 
-    addPropListener(name, prop$) {
-      return prop$.subscribe((value) => {
-        // don't re-render if value is the same.
-        if (value === this.state[name]) {
-          return;
-        }
-
-        const prop = {};
-        prop[name] = value;
-        this.setState(prop);
-      });
-    }
-
-    subscribe(props) {
-      if (this.subscriptions) {
-        this.unsubscribe();
-      }
-
-      this.subscriptions = [];
-
-      Object.keys(props).forEach(key => {
-        const value = props[key];
-        if (isRxObservable(value)) {
-          const subscription = this.addPropListener(key, value);
-          this.subscriptions.push(subscription);
-        }
-      });
-    }
-
-    unsubscribe() {
-      this.subscriptions.forEach(subscription => subscription.unsubscribe());
-      this.subscriptions = null;
-    }
-
-    render() {
-      if (!this.state.mount) {
-        return null;
-      }
-
-      const finalProps = pickProps(this.state, (key) => key !== 'mount');
-      return React.createElement(tag, finalProps);
-    }
-  }
-
-  return ReactiveClass;
-}
+  return React.createElement(
+    React.Fragment,
+    {},
+    props.mount && !newProps.mount ? null : React.createElement(component, omit('mount', newProps))
+  );
+};

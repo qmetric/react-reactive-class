@@ -32,6 +32,7 @@
     "@babel/polyfill": "7.4.0",
     "@babel/preset-env": "7.1.0",
     "babel-eslint": "4.1.0",
+    "lodash": "^4.17.15",
     "react": "16.9.0",
     "react-dom-factories": "^1.0.2",
     "rimraf": "^2.4.3"
