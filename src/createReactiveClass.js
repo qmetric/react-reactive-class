@@ -13,13 +13,18 @@ export default component => React.forwardRef((props, ref) => {
   };
 
   const newProps = {
-    ...mapValues(prop => (prop.subscribe ? usePropSubscription(prop) : prop), props),
+    ...mapValues(
+      prop => (prop && prop.subscribe ? usePropSubscription(prop) : prop),
+      props
+    ),
     ref
   };
 
   return React.createElement(
     React.Fragment,
     {},
-    props.mount && !newProps.mount ? null : React.createElement(component, omit('mount', newProps))
+    props.mount && !newProps.mount
+      ? null
+      : React.createElement(component, omit("mount", newProps))
   );
 });
