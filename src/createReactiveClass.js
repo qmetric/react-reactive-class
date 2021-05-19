@@ -1,5 +1,5 @@
 import React from 'react';
-import {isRxObservable, pickProps} from './utils';
+import { isRxObservable, pickProps } from './utils';
 
 export default function createReactiveClass(tag) {
   class ReactiveClass extends React.Component {
@@ -43,7 +43,7 @@ export default function createReactiveClass(tag) {
 
       this.subscriptions = [];
 
-      Object.keys(props).forEach(key => {
+      Object.keys(props).forEach((key) => {
         const value = props[key];
         if (isRxObservable(value)) {
           const subscription = this.addPropListener(key, value);
@@ -53,7 +53,7 @@ export default function createReactiveClass(tag) {
     }
 
     unsubscribe() {
-      this.subscriptions.forEach(subscription => subscription.unsubscribe());
+      this.subscriptions.forEach((subscription) => subscription.unsubscribe());
       this.subscriptions = null;
     }
 

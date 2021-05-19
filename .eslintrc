@@ -1,8 +1,20 @@
 {
   "extends": "eslint-config-airbnb",
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "node": true
+  },
+  "rules": {
+    "camelcase": [
+      "error",
+      {
+        "allow": [
+          "UNSAFE_componentWillMount",
+          "UNSAFE_componentWillReceiveProps"
+        ]
+      }
+    ],
+    "react/destructuring-assignment": "off"
   }
 }
