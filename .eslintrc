@@ -4,5 +4,17 @@
   "env": {
     "browser": true,
     "node": true
+  },
+  "rules": {
+    "camelcase": [
+      "error",
+      {
+        "allow": [
+          "UNSAFE_componentWillMount",
+          "UNSAFE_componentWillReceiveProps"
+        ]
+      }
+    ],
+    "react/destructuring-assignment": "off"
   }
 }
