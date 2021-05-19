@@ -1,14 +1,13 @@
 {
-  presets: [
+  "presets": [
     [
       "@babel/preset-env",
       {
         "targets": {
           "esmodules": true,
-          "node": "6.9.1"
+          "node": "14.16.0"
         }
       }
     ]
   ]
 }
-
